@@ -1,0 +1,8 @@
+_log
+_build
+*.docdir
+*.native
+*.byte
+*.d.native
+*.p.byte
+*.top
