@@ -62,11 +62,10 @@ let expect t pb =
   if is_same t pb.lookahead then pb 
   else error()
 
-(* factor 	= 	ident | number | "(" expression ")". *)
-let rec parse_factor pb =  
-  let pb = next pb in 
+(* factor = ident | number | "(" expression ")". *)
+let rec parse_factor pb = 
   match pb.lookahead with
-  | Ident _ | Number _ -> pb
+  | Ident _ | Number _ -> next pb
   | Lparen -> 
     parse_expression pb
     |> expect Rparen
@@ -78,14 +77,13 @@ and parse_expression pb =
   let rec loop pbl =
     let pbl = next pbl in
     if is_plus_minus pbl.lookahead then loop (parse_term pbl) else pbl 
-  in 
-  let pb = next pb in 
+  in   
   let pb = if is_plus_minus pb.lookahead then next pb else pb
   in  
   parse_term pb
   |> loop	
 
-(* term 	= 	factor {("*"|"/") factor}. *)		
+(* term = factor {("*"|"/") factor}. *)
 and parse_term pb =
   let is_times_div = is_token_in [Times;Divide] in 
   let rec loop pbl =
@@ -94,5 +92,52 @@ and parse_term pb =
   in 
   parse_factor pb
   |> loop 
+
+(* condition = "ODD" expression | expression ("="|"#"|"<="|"<"|">"|">=") expression . *)
+let parse_condition pb =
+  let is_condition_operator = is_token_in [Equal;NotEqual;LessThanEql;LessThan;GreaterThan;GreaterThanEql] in
+  if pb.lookahead = Odd then next pb |> parse_expression
+  else         
+      let pb = parse_expression pb in 
+      let pb = if is_condition_operator pb.lookahead then next pb else error() in
+      parse_expression pb
+
+(* statement =   
+   [ ident ":=" expression 
+   | "CALL" ident 
+   | "?" ident 
+   | "!" expression
+   | "BEGIN" statement {";" statement } "END"
+   | "IF" condition "THEN" statement
+   | "WHILE" condition "DO" statement ]. 
+*)
+let rec parse_statement pb = 
+  match pb.lookahead with
+  | Ident i -> expect Assignment pb |> parse_expression
+  | Call -> expect (Ident "") pb
+  | Read -> expect (Ident "") pb 
+  | Write -> next pb |> parse_expression
+  | Begin ->     
+    let rec loop_stmt pbl =
+      next pbl      
+      |> function
+      | pbl when pbl.lookahead = Semicolon -> next pbl |> parse_statement |> loop_stmt
+      | _ -> pbl
+    in 
+      next pb
+      |> parse_statement
+      |> loop_stmt
+      |> expect End 
+  | If -> 
+    next pb
+    |> parse_condition
+    |> expect Then
+    |> parse_statement
+  | While -> 
+    next pb
+    |> parse_condition
+    |> expect Do
+    |> parse_statement
+  | _ -> pb               (* Empty statement. *)
 
 
