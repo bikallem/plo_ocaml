@@ -23,12 +23,12 @@ let lexbuf = Lexing.from_string
 
 let test_var _ = 
   let lb = lexbuf "var" in 
-  let tok1 = token lb in  	
+  let tok1 = Lexer.next_token lb in  	
   assert_equal tok1 Var	
 
 let test_ident _ = 
   let lb = lexbuf "var vart" in 
-  let tok1 = token lb |> ignore; token lb in 
+  let tok1 = Lexer.next_token lb |> ignore; Lexer.next_token lb in 
   assert_equal tok1 (Ident "vart")
 
 let suite =

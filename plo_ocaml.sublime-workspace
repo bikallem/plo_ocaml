@@ -252,7 +252,7 @@
 	],
 	"find":
 	{
-		"height": 36.0
+		"height": 23.0
 	},
 	"find_in_files":
 	{
@@ -289,7 +289,7 @@
 	},
 	"incremental_find":
 	{
-		"height": 24.0
+		"height": 21.0
 	},
 	"input":
 	{
@@ -318,22 +318,14 @@
 		]
 	},
 	"menu_visible": true,
-	"output.exec":
-	{
-		"height": 118.0
-	},
 	"output.find_results":
 	{
 		"height": 0.0
 	},
-	"output.unsaved_changes":
-	{
-		"height": 88.0
-	},
 	"pinned_build_system": "",
 	"replace":
 	{
-		"height": 66.0
+		"height": 42.0
 	},
 	"save_all_on_build": true,
 	"select_file":
