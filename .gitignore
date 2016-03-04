@@ -6,3 +6,5 @@ _build
 *.d.native
 *.p.byte
 *.top
+*.cmo
+*.cmi

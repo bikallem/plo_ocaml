@@ -1,3 +1,4 @@
 #directory "_build/src";;
 #use "topfind";;
-(*#load "ll1.cmo";;*)
+#load "lexer.cmo";;
+#load "parser.cmo";;

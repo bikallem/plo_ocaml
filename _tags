@@ -1,4 +1,4 @@
 true : bin_annot, annot, safe_string
-<*.ml>: syntax(camlp4o)
-true : package(cmdliner)
+true : package(oUnit)
 <src> : include
+<test> : include

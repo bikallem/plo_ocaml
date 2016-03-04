@@ -7,7 +7,6 @@ let error_msg lexbuf =
   |> fun s -> Error s
   |> raise
 
-
 (* Terminal symbols for PL/O. *)
 type token = 
   | Period      (* . *)
@@ -69,8 +68,8 @@ let str = ['A'-'Z' 'a'-'z']['A'-'Z' 'a'-'z' '0'-'9']*
 let ws = [' ' '\t' '\n']+
 let num = ['0'-'9']+
 
-rule next_token = parse 
-|  ws       { next_token lexbuf }
+rule token = parse 
+|  ws       { token lexbuf } (* skip blanks. *)
 | '.'       { Period }
 | '='       { Equal }
 | ','       { Comma }
