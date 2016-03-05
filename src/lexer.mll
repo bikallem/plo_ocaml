@@ -17,6 +17,7 @@ type token =
   | Comma             (* , *)
   | Semicolon         (* ; *)
   | Var           (* var *)
+  | Procedure      (* procedure *)
   | Assignment        (* := *)
   | Call              (* call *)
   | Read     (* ?  *)
@@ -53,6 +54,7 @@ let keyword_tbl =
   (fun tbl (kwd, tok) -> KeywordTbl.add kwd tok tbl)
   KeywordTbl.empty
   ["const", Const;   
+   "procedure", Procedure;
    "var", Var;   
    "call", Call;   
    "begin", Begin;

@@ -98,11 +98,11 @@ let parse_condition pb =
   let is_condition_operator = is_token_in [Equal;NotEqual;LessThanEql;LessThan;GreaterThan;GreaterThanEql] in
   if pb.lookahead = Odd then next pb |> parse_expression
   else         
-      let pb = parse_expression pb in 
-      let pb = if is_condition_operator pb.lookahead then next pb else error() in
-      parse_expression pb
+    let pb = parse_expression pb in 
+    let pb = if is_condition_operator pb.lookahead then next pb else error() in
+    parse_expression pb
 
-(* statement =   
+(* statement = 
    [ ident ":=" expression 
    | "CALL" ident 
    | "?" ident 
@@ -124,10 +124,10 @@ let rec parse_statement pb =
       | pbl when pbl.lookahead = Semicolon -> next pbl |> parse_statement |> loop_stmt
       | _ -> pbl
     in 
-      next pb
-      |> parse_statement
-      |> loop_stmt
-      |> expect End 
+    next pb
+    |> parse_statement
+    |> loop_stmt
+    |> expect End 
   | If -> 
     next pb
     |> parse_condition
@@ -140,4 +140,49 @@ let rec parse_statement pb =
     |> parse_statement
   | _ -> pb               (* Empty statement. *)
 
+(* block   =   
+   ["CONST" ident "=" number { "," ident "=" number} ";"]
+   ["VAR" ident {"," ident} ";"]
+   {"PROCEDURE" ident ";" block ";"} statement. *)
+let rec parse_block pb =
+  let pb = 
+    match pb.lookahead with
+    | Const -> 
+      let p_const pb = next pb |> expect (Ident "") |> expect Equal |> expect (Number 0) in
+      let rec loop_const pb =
+        next pb
+        |> function 
+        | pb when pb.lookahead = Comma -> p_const pb |> loop_const
+        | _ -> pb
+      in 
+      p_const pb
+      |> loop_const
+    | Var -> 
+      let p_var pb = next pb |> expect (Ident "") in
+      let rec loop_var pb =
+        next pb
+        |> function
+        | pb when pb.lookahead = Comma -> p_var pb |> loop_var
+        | _ -> pb
+      in 
+      p_var pb
+      |> loop_var
+    | Procedure ->
+      let p_proc pb = expect (Ident "") pb |> expect Semicolon |> parse_block in 
+      let rec loop_proc pb =  
+        next pb
+        |> function 
+        | pb when pb.lookahead = Procedure -> p_proc pb |> loop_proc
+        | _ -> pb 
+      in 
+      p_proc pb
+      |> loop_proc
+    | _ -> error()
+  in 
+  parse_statement pb
 
+(* program  =   block "." . *)
+let program pb = 
+  next pb 
+  |> parse_block
+  |> expect Period 
