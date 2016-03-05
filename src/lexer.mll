@@ -1,46 +1,48 @@
-{
-
-exception Error of string
+(** Lexer.
+  A [Lexer] recognizes terminal symbols for PL/0. *)
+{  
+exception Lexer_error of string
+(** Raised when [!Lexer] encounters unrecongnized character. *)
 
 let error_msg lexbuf = 
   Printf.sprintf "At offset %d: unexpected character.\n" (Lexing.lexeme_start lexbuf)
-  |> fun s -> Error s
+  |> fun s -> Lexer_error s
   |> raise
 
-(* Terminal symbols for PL/O. *)
+(** Represents terminal symbols for PL/O. *)
 type token = 
-  | Period      (* . *)
-  | Const             (* const *)
-  | Ident of string   (* x, y, z .. *)
-  | Equal         (* = *)
-  | Number of int     (* 123, 2, 0, etc *)
-  | Comma             (* , *)
-  | Semicolon         (* ; *)
-  | Var           (* var *)
-  | Procedure      (* procedure *)
-  | Assignment        (* := *)
-  | Call              (* call *)
-  | Read     (* ?  *)
-  | Write    (* !  *) 
-  | Begin         (* begin *)
-  | End           (* end *)
-  | If          (* if  *)
-  | Then          (* then *)
-  | While         (* while *)
-  | Do          (* do *)
-  | Odd           (* odd *)  
-  | NotEqual        (* #  *)
-  | LessThan        (* <  *)
-  | LessThanEql       (* <= *)
-  | GreaterThan       (* >  *)
-  | GreaterThanEql    (* >= *)
-  | Plus          (* +  *)
-  | Minus         (* -  *)
+  | Period      (** . *)
+  | Const             (** const *)
+  | Ident of string   (** x, y, z .. *)
+  | Equal         (** = *)
+  | Number of int     (** 123, 2, 0, etc *)
+  | Comma             (** , *)
+  | Semicolon         (** ; *)
+  | Var           (** var *)
+  | Procedure      (** procedure *)
+  | Assignment        (** := *)
+  | Call              (** call *)
+  | Read     (** ?  *)
+  | Write    (** !  *) 
+  | Begin         (** begin *)
+  | End           (** end *)
+  | If          (** if  *)
+  | Then          (** then *)
+  | While         (** while *)
+  | Do          (** do *)
+  | Odd           (** odd *)  
+  | NotEqual        (** #  *)
+  | LessThan        (** <  *)
+  | LessThanEql       (** <= *)
+  | GreaterThan       (** >  *)
+  | GreaterThanEql    (** >= *)
+  | Plus          (** +  *)
+  | Minus         (** -  *)
   | Times             (* *  *)      
-  | Divide        (* /  *)
-  | Lparen            (* (  *)
-  | Rparen            (* )  *)
-  | Eof               (* end of file, '$' *)
+  | Divide        (** /  *)
+  | Lparen            (** (  *)
+  | Rparen            (** )  *)
+  | Eof               (** end of file also known as ['$'] *)
 
 module KeywordTbl =
   Map.Make(struct
@@ -94,3 +96,4 @@ rule next_token = parse
               with Not_found -> Ident (s) }
 | eof       { Eof }
 | _         { error_msg lexbuf }
+(** Retrieves the next recongnized token from [lexbuf]. *)

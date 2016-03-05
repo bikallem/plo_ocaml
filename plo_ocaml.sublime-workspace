@@ -4,8 +4,48 @@
 		"selected_items":
 		[
 			[
-				"is",
+				"from",
+				"Lexing.from_channel	val in_channel -> lexbuf"
+			],
+			[
+				"ope",
+				"Pervasives.open_in	val string -> in_channel"
+			],
+			[
+				"par",
+				"parse_block	let"
+			],
+			[
+				"loop",
+				"loop_proc	let"
+			],
+			[
+				"pa",
+				"parse_block	let"
+			],
+			[
+				"parse",
+				"parse_condition	let"
+			],
+			[
+				"pars",
+				"parse_condition	let"
+			],
+			[
+				"Lex",
+				"Lexing	module"
+			],
+			[
+				"is_",
 				"is_token_in	let"
+			],
+			[
+				"lex",
+				"Lexing.lexbuf	type { refill_buff : lexbuf -> unit; mutable lex_buffer : bytes; mutable lex_buffer_len : int; mutable lex_abs_pos : int; mutable lex_start_pos : int; mutable lex_curr_pos : int; mutable lex_last_pos : int; mutable lex_last_action : int; mutable lex_eof_reached : bool; mutable lex_mem : int array; mutable lex_start_p : position; mutable lex_curr_p : position; }"
+			],
+			[
+				"is",
+				"is_plus_minus	let"
 			],
 			[
 				"expe",
@@ -28,20 +68,12 @@
 				"tok3	let"
 			],
 			[
-				"from",
-				"Lexing.from_string	val string -> lexbuf"
-			],
-			[
 				"assert",
 				"OUnit2.assert_equal	val ?ctxt:test_ctxt -> ?cmp:('a -> 'a -> bool) -> ?printer:('a -> string) -> ?pp_diff:(Format.formatter -> 'a * 'a -> unit) -> ?msg:string -> 'a -> 'a -> unit"
 			],
 			[
 				"OUni",
 				"OUnit2	module"
-			],
-			[
-				"Lex",
-				"Lexer	module"
 			],
 			[
 				"Strin",
@@ -153,7 +185,7 @@
 	},
 	"console":
 	{
-		"height": 268.0,
+		"height": 120.0,
 		"history":
 		[
 			"view.encoding()",
@@ -176,7 +208,28 @@
 	},
 	"file_history":
 	[
+		"/home/bikal/projects/plo_ocaml/src/_parser.mli",
+		"/home/bikal/projects/plo_ocaml/src/_lexer.mli",
+		"/home/bikal/projects/plo_ocaml/_build/src/lexer.ml",
+		"/home/bikal/projects/plo_ocaml/_build/src/lexer.mli",
+		"/home/bikal/projects/plo_ocaml/src/lexer.mll",
+		"/home/bikal/projects/plo_ocaml/src/lexer.mli",
+		"/home/bikal/.opam/4.02.3/installed.roots",
+		"/home/bikal/projects/cmdliner/build",
+		"/home/bikal/projects/cmdliner/test/tests.itarget",
+		"/home/bikal/projects/cmdliner/test/tail_ex.ml",
+		"/home/bikal/projects/plo_ocaml/Makefile",
+		"/home/bikal/projects/cmdliner/pkg/build.ml",
+		"/home/bikal/projects/cmdliner/_tags",
+		"/home/bikal/projects/cmdliner/.ocp-indent",
+		"/home/bikal/projects/cmdliner/.merlin",
 		"/home/bikal/projects/plo_ocaml/test/test_lexer.ml",
+		"/home/bikal/projects/plo_ocaml/test/test_parser.ml",
+		"/home/bikal/projects/plo_ocaml/.ocamlinit",
+		"/home/bikal/projects/plo_parser/parser.c",
+		"/home/bikal/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/bikal/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/bikal/projects/plo_ocaml/src/plo.ml",
 		"/home/bikal/projects/plo_ocaml/src/parser.ml",
 		"/home/bikal/Downloads/ll1/ll1_fixed.ml",
 		"/home/bikal/Downloads/ll1/tokenizer.ml",
@@ -188,30 +241,22 @@
 		"/home/bikal/projects/plo_ocaml/_build/ocamlc.where",
 		"/home/bikal/projects/plo_ocaml/_build/oUnit-lexer tests-linux-9rho#00.log",
 		"/home/bikal/projects/plo_ocaml/.gitignore",
-		"/home/bikal/projects/plo_ocaml/Makefile",
 		"/home/bikal/projects/plo_ocaml/_tags",
-		"/home/bikal/projects/plo_ocaml/src/plo.ml",
-		"/home/bikal/projects/plo_ocaml/src/lexer.mll",
 		"/home/bikal/projects/ll1parser_add/ll1parser_add_ocaml/src/ll1.ml",
 		"/home/bikal/projects/mini-compiler-LL/src/mini.ml",
-		"/home/bikal/projects/plo_ocaml/.ocamlinit",
 		"/home/bikal/projects/plo_ocaml/plo_ocaml.sublime-project",
 		"/home/bikal/projects/menhir_toy1/menhir_toy1.sublime-project",
 		"/home/bikal/projects/plo_ocaml/src/lexer.ml",
 		"/home/bikal/projects/menhir_toy1/src/lexer.mll",
 		"/home/bikal/projects/plo_ocaml/src/token.ml",
 		"/home/bikal/.config/sublime-text-3/Packages/OCaml Autocompletion/sublime_ocp_index.py",
-		"/home/bikal/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
 		"/home/bikal/projects/parser_recursive_descent_c/lexer.c",
 		"/home/bikal/.profile",
 		"/home/bikal/.config/sublime-text-3/Packages/Package Control/Package Control.sublime-settings",
 		"/home/bikal/projects/mini-compiler-LL/.ocp-indent",
 		"/home/bikal/projects/mini-compiler-LL/Makefile",
 		"/home/bikal/projects/mini-compiler-LL/src/mini.mli",
-		"/home/bikal/projects/cmdliner/.ocp-indent",
-		"/home/bikal/projects/cmdliner/.merlin",
 		"/home/bikal/projects/mini-compiler-LL/_tags",
-		"/home/bikal/projects/cmdliner/_tags",
 		"/home/bikal/projects/mini-compiler-LL/src/mini.odocl",
 		"/home/bikal/projects/menhir_formula/src/formula.mli",
 		"/home/bikal/projects/mini-compiler-LL/examples/hello.mc",
@@ -225,7 +270,6 @@
 		"/home/bikal/projects/sedlex_examples/_tags",
 		"/home/bikal/projects/sedlex_examples/tokenizer.ml",
 		"/home/bikal/projects/sedlex_examples/sedlex_examples.sublime-project",
-		"/home/bikal/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
 		"/home/bikal/projects/menhir_formula/src/parser.mly",
 		"/home/bikal/projects/menhir_formula/_tags",
 		"/home/bikal/projects/menhir_formula/menhir_formula.sublime-project",
@@ -252,7 +296,7 @@
 	],
 	"find":
 	{
-		"height": 23.0
+		"height": 36.0
 	},
 	"find_in_files":
 	{
@@ -266,6 +310,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"exception",
 			"token",
 			"token ",
 			"token",
@@ -289,7 +334,7 @@
 	},
 	"incremental_find":
 	{
-		"height": 21.0
+		"height": 22.0
 	},
 	"input":
 	{
@@ -362,7 +407,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 220.0,
+	"side_bar_width": 208.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

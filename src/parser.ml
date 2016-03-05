@@ -1,66 +1,60 @@
-(**
+(** Parser.
+    A [Parser] is a LL(1), top-down recursive descent parser for PL/0 language. The EBNF of the 
+    language is as follows. 
 
-   LL(1) top-down recursive descent parser for PL/0 language.
+    [program  =   block "." .
 
+    block   =   ["CONST" ident "=" number { "," ident "=" number} ";"]
+    ["VAR" ident {"," ident} ";"]
+    {"PROCEDURE" ident ";" block ";"} statement.
 
-   program 	= 	block "." .
+    statement   =   [ident ":=" expression | "CALL" ident | "?" ident | "!" expression
+    | "BEGIN" statement {";" statement } "END"
+    | "IF" condition "THEN" statement
+    | "WHILE" condition "DO" statement ].
 
-   block 	= 	["CONST" ident "=" number { "," ident "=" number} ";"]
-   ["VAR" ident {"," ident} ";"]
-   {"PROCEDURE" ident ";" block ";"} statement.
+    condition   =   "ODD" expression | expression ("="|"#"|"<="|"<"|">"|">=") expression .
 
-   statement 	= 	[ident ":=" expression | "CALL" ident | "?" ident | "!" expression
-   | "BEGIN" statement {";" statement } "END"
-   | "IF" condition "THEN" statement
-   | "WHILE" condition "DO" statement ].
+    expression  =   ["+"|"-"] term {("+"|"-") term}.
 
-   condition 	= 	"ODD" expression | expression ("="|"#"|"<="|"<"|">"|">=") expression .
+    term  =   factor {("*"|"/") factor}.
 
-   expression 	= 	["+"|"-"] term {("+"|"-") term}.
+    factor  =   ident | number | "(" expression ")".]
 
-   term 	= 	factor {("*"|"/") factor}.
-
-   factor 	= 	ident | number | "(" expression ")".
-
-   http://emotion.inrialpes.fr/people/lehy/ll1.html
-
-*)
+    https://en.wikipedia.org/wiki/PL/0. *)
 
 open Lexer
 exception Parse_error of string 
+(** Raised when [!Parser] encounters an unrecongnized token. *)
 
-(* Parser buffer. Holds lookahead token and Lexing.lexbuf. *)
+(** Represents a buffer used during parsing of various prodcutions. *)
 type parse_buffer = 
-  {lookahead : Lexer.token; (* look-ahead token. *)
-   lexbuf : Lexing.lexbuf}
+  {lookahead : Lexer.token; (** look-ahead token. *)
+   lexbuf : Lexing.lexbuf}  (** lexer buffer. *)
 
-(* Retrieve a new parser buffer with the next lookahead token. *)
 let next pb = {pb with lookahead = Lexer.next_token pb.lexbuf}
+(** Retrieves a new parser buffer with the next lookahead token. *)
 
-let parse file = 
-  (* let inp = open_in file and lexbuf = Lexing.from_channel inp in 
-     	let tok =  *)
-  Printf.printf "\nParsing input '%s' ... \n" file
+let error () = raise (Parse_error "\nUnexpected 'token'. ")
+(** Throws [Parse_error]. *)
 
-let error () = raise (Parse_error "\nUnexpected Symbol.")
-
-(* Are the two tokens of same type ? *)
 let is_same t1 t2 = 
   match t1, t2 with 
   | Ident _, Ident _ -> true
   | Number _, Number _ -> true
   | a, b when a = b -> true
   | _ , _ -> false
+(** Returns [true] if two [Lexer.token]s are the same type, [false] otherwise. *)
 
-(* Returns true if token 't' is in token list 'l'. false otherwise. *)
 let is_token_in l t = List.exists (is_same t) l
+(** Returns true if token 't' is in [list Lexer.token] 'l'. false otherwise. *)
 
-(* Expects the given token 't' to match the lookahead token in 'pb'. Raises 'Parse_error' exception
-   	if the two tokens donot match. *)
 let expect t pb = 
   let pb = next pb in 
   if is_same t pb.lookahead then pb 
   else error()
+(** Expects the given token [t] to match the [pb.lookahead] token in [pb]. Raises 'Parse_error' exception
+    if the two tokens donot match. *)
 
 (* factor = ident | number | "(" expression ")". *)
 let rec parse_factor pb = 
@@ -181,8 +175,14 @@ let rec parse_block pb =
   in 
   parse_statement pb
 
-(* program  =   block "." . *)
-let program pb = 
-  next pb 
-  |> parse_block
+(* program  =   block "."  *)
+let program pb =   
+  parse_block pb
   |> expect Period 
+
+(* Main entry point to the PL/O parser. *)
+let parse_plo lb = 
+  let pb = {lookahead = Lexer.Eof; lexbuf = lb}
+  in 
+  next pb 
+  |> program
