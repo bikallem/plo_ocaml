@@ -1,4 +1,4 @@
 true : bin_annot, annot, safe_string
-true : package(oUnit)
+true : package(kaputt)
 <src> : include
 <test> : include

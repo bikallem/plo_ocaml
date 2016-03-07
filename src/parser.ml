@@ -24,21 +24,24 @@
     https://en.wikipedia.org/wiki/PL/0. *)
 
 open Lexer
-exception Parse_error of string 
+exception Syntax_error of string 
 (** Raised when [!Parser] encounters an unrecongnized token. *)
 
-(** Represents a buffer used during parsing of various prodcutions. *)
 type parse_buffer = 
   {lookahead : Lexer.token; (** look-ahead token. *)
    lexbuf : Lexing.lexbuf}  (** lexer buffer. *)
+(** Represents a parser buffer used during parsing of various productions. *)
+
+let default_pb s = {lookahead = Lexer.Eof; lexbuf = Lexing.from_string s}
+(** Create a default [parse_buffer] with the given string [s]. *)
 
 let next pb = {pb with lookahead = Lexer.next_token pb.lexbuf}
 (** Retrieves a new parser buffer with the next lookahead token. *)
 
-let error () = raise (Parse_error "\nUnexpected 'token'. ")
+let error () = raise (Syntax_error "\nUnexpected 'token'. ")
 (** Throws [Parse_error]. *)
 
-let is_same t1 t2 = 
+let is_same t1 t2 =
   match t1, t2 with 
   | Ident _, Ident _ -> true
   | Number _, Number _ -> true
