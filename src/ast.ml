@@ -1,7 +1,8 @@
 type expression_op =
   | Plus
   | Minus
-
+  [@@deriving show]
+  
 type condition_op =
   | Equal
   | NotEqual
@@ -9,25 +10,29 @@ type condition_op =
   | LessThanEql
   | GreaterThan
   | GreaterThanEql
+  [@@deriving show]
 
 type term_op =
   | Multiply
   | Divide
+    [@@deriving show]
 
 type factor =
   | Identifier of string
   | Number of int
   | Expr of expression
-and term = factor * (term_op * factor) list
-and expression = start_expression * (expression_op * term) list
-and start_expression = expression_op option * term
+  [@@deriving show]
+and term = factor * (term_op * factor) list [@@deriving show]
+and expression = start_expression * (expression_op * term) list [@@deriving show]
+and start_expression = expression_op option * term [@@deriving show]
 
 type condition =
   | Odd of expression
   | Logical of expression * condition_op * expression
+  [@@deriving show]               
 
-type identifier = string
-type number = int
+type identifier = string [@@deriving show]
+type number = int [@@deriving show]
 
 type statement =
   | Assignment of identifier * expression
@@ -38,11 +43,14 @@ type statement =
   | IfThen of condition * statement
   | WhileDo of condition * statement
   | Empty
+  [@@deriving show]
 
-type constant = (identifier * number)
-type var = identifier
+type constant = (identifier * number) [@@deriving show]
+type var = identifier [@@deriving show]
 
 type block =
   | Block of constant list * var list * procedure list * statement
-and procedure = identifier * block
+  [@@deriving show]
+and procedure = identifier * block [@@deriving show]
+                                               
 

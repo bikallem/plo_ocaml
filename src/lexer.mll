@@ -43,7 +43,8 @@ type token =
   | Lparen            (** (  *)
   | Rparen            (** )  *)
   | Eof               (** end of file also known as ['$'] *)
-
+  [@@deriving show]
+  
 module KeywordTbl =
   Map.Make(struct
     type t = string

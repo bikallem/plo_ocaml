@@ -40,10 +40,17 @@ let default_pb s = {lookahead = Lexer.Eof; lexbuf = Lexing.from_string s}
 let next pb = {pb with lookahead = Lexer.next_token pb.lexbuf}
 (** Retrieves a new parser buffer with the next lookahead token. *)
 
-let error s =
-  let e = Syntax_error(Printf.sprintf "Unexpected 'token' in '%s' " s) in
+let expect_error pb t fname =
+  let la_str = show_token pb.lookahead and e_str = show_token t in
+  let err_msg = Printf.sprintf "Syntax Error. Expected token '%s', however received '%s' in %s.\n" e_str la_str fname in 
+  let e = Syntax_error err_msg in
   raise e
 
+let error pb fname =
+  let la_str = show_token pb.lookahead in 
+  let err_msg = Printf.sprintf "Syntax Error. Unexpected token '%s'\n" la_str in
+  let e = Syntax_error err_msg in
+  raise e            
 (** Throws [Parse_error]. *)
 
 let is_same t1 t2 =
@@ -72,8 +79,8 @@ let rec parse_factor pb =
   | Lparen ->
     let (pb, e) = next pb |> parse_expression in
     let (pb, expected) = expect Rparen pb in
-    if expected then (pb, Expr e) else error "parse_factor()"
-  | _ -> error "parse_factor()"
+    if expected then (pb, Expr e) else expect_error pb Rparen "parse_factor()"
+  | _ -> error pb "parse_factor()"
 
 (* term = factor {("*"|"/") factor}. *)
 and parse_term pb =

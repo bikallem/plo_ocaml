@@ -2,4 +2,4 @@ S src
 S test
 B _build/**
 
-PKG kaputt 
+PKG kaputt ppx_deriving.std
