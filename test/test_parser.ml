@@ -25,7 +25,7 @@ open Lexer
     factor  =   ident | number | "(" expression ")".]
 
     https://en.wikipedia.org/wiki/PL/0. *)
-    
+
 let sample1 = "
 VAR x, squ;
 
