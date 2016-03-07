@@ -3,3 +3,4 @@ S test
 B _build/**
 
 PKG kaputt ppx_deriving.std
+FLG -safe-string
