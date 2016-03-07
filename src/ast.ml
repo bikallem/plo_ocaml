@@ -21,14 +21,14 @@ type factor =
 and term = factor * (term_op * factor) list
 and expression = start_expression * (expression_op * term) list
 and start_expression = expression_op option * term
-  
+
 type condition =
   | Odd of expression
   | Logical of expression * condition_op * expression
 
 type identifier = string
 type number = int
-  
+
 type statement =
   | Assignment of identifier * expression
   | Call of identifier

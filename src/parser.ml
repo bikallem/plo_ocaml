@@ -40,7 +40,10 @@ let default_pb s = {lookahead = Lexer.Eof; lexbuf = Lexing.from_string s}
 let next pb = {pb with lookahead = Lexer.next_token pb.lexbuf}
 (** Retrieves a new parser buffer with the next lookahead token. *)
 
-let error () = raise (Syntax_error "\nUnexpected 'token'. ")
+let error s =
+  let e = Syntax_error(Printf.sprintf "Unexpected 'token' in '%s' " s) in
+  raise e
+
 (** Throws [Parse_error]. *)
 
 let is_same t1 t2 =
@@ -54,9 +57,9 @@ let is_same t1 t2 =
 let is_token_in l t = List.exists (is_same t) l
 (** Returns true if token 't' is in [list Lexer.token] 'l'. false otherwise. *)
 
-let expect t pb = 
-  let pb = next pb in 
-  (pb, is_same t pb.lookahead)
+let expect t pb =
+  let expected = is_same t pb.lookahead in
+  if expected then (next pb, expected) else (pb, expected)
 
 (** Expects the given token [t] to match the [pb.lookahead] token in [pb]. Raises 'Syntax_error' exception
     if the two tokens donot match. *)
@@ -68,43 +71,13 @@ let rec parse_factor pb =
   | Number num ->(next pb, Number num)
   | Lparen ->
     let (pb, e) = next pb |> parse_expression in
-    let (pb, expected) = expect Rparen pb in 
-    if expected then (pb, Expr e) else error()
-  | _ -> error ()
+    let (pb, expected) = expect Rparen pb in
+    if expected then (pb, Expr e) else error "parse_factor()"
+  | _ -> error "parse_factor()"
 
-(* expression = ["+"|"-"] term {("+"|"-") term} . *)
-and parse_expression pb =
-  let p_start_term pb =
-    let pb = next pb in
-    if pb.lookahead = Lexer.Plus then
-      let (pb, t) = next pb |> parse_term in 
-      (pb, (Some Ast.Plus, t))
-    else if pb.lookahead = Lexer.Minus then
-      let (pb, t) = next pb |> parse_term in
-      (pb, (Some Ast.Minus, t))
-    else
-      let (pb, t) = next pb |> parse_term in
-      (pb, (None, t)) in
-  
-  let rec loop_terms pb terms =
-    let pb = next pb in
-    match pb.lookahead with
-    | Lexer.Plus ->
-      let (pb, t) = next pb |> parse_term in 
-      loop_terms pb ((Ast.Plus,t)::terms)
-    | Lexer.Minus ->
-      let (pb, t) = next pb |> parse_term in
-      loop_terms pb ((Ast.Minus,t)::terms)
-    | _ -> (pb, terms) in 
-  let (pb, start_term) = p_start_term pb in
-  let (pb, terms) = loop_terms pb [] in 
-  let expr = (start_term, terms) in
-  (pb, expr)
-  
 (* term = factor {("*"|"/") factor}. *)
 and parse_term pb =
   let rec loop_factors pb facs =
-    let pb = next pb in
     if pb.lookahead = Lexer.Divide then
       let (pb, fac) = next pb |> parse_factor in
       loop_factors pb ((Ast.Divide, fac)::facs)
@@ -116,6 +89,34 @@ and parse_term pb =
   let (pb, facs) = loop_factors pb [] in
   let term = (fac, facs) in 
   (pb, term)
+
+(* expression = ["+"|"-"] term {("+"|"-") term} . *)
+and parse_expression pb =
+  let p_start_term pb =    
+    if pb.lookahead = Lexer.Plus then
+      let (pb, t) = next pb |> parse_term in 
+      (pb, (Some Ast.Plus, t))
+    else if pb.lookahead = Lexer.Minus then
+      let (pb, t) = next pb |> parse_term in
+      (pb, (Some Ast.Minus, t))
+    else
+      let (pb, t) = parse_term pb in
+      (pb, (None, t)) in
+
+  let rec loop_terms pb terms =   
+    match pb.lookahead with
+    | Lexer.Plus ->
+      let (pb, t) = next pb |> parse_term in 
+      loop_terms pb ((Ast.Plus, t)::terms)
+    | Lexer.Minus ->
+      let (pb, t) = next pb |> parse_term in
+      loop_terms pb ((Ast.Minus, t)::terms)
+    | _ -> (pb, terms) in 
+  let (pb, start_term) = p_start_term pb in
+  let (pb, terms) = loop_terms pb [] in 
+  let expr = (start_term, terms) in
+  (pb, expr)
+
 
 (* (\* condition = "ODD" expression | expression ("="|"#"|"<="|"<"|">"|">=") expression . *\) *)
 (* let parse_condition pb = *)
