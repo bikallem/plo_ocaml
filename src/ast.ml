@@ -2,7 +2,7 @@ type expression_op =
   | Plus
   | Minus
   [@@deriving show]
-  
+
 type logical_op =
   | Equal
   | NotEqual
@@ -15,7 +15,7 @@ type logical_op =
 type term_op =
   | Multiply
   | Divide
-    [@@deriving show]
+  [@@deriving show]
 
 type factor =
   | Identifier of string
@@ -51,6 +51,8 @@ type var = identifier [@@deriving show]
 type block =
   | Block of constant list * var list * procedure list * statement
   [@@deriving show]
-and procedure = identifier * block [@@deriving show]
-                                               
+and procedure =
+  | Procedure of identifier * block [@@deriving show]
 
+type program =
+  | Program of block [@@deriving show]

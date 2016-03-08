@@ -8,4 +8,4 @@ let _ =
     let input = Pervasives.open_in file in 
     let lb = Lexing.from_channel input in 
     Printf.printf "\nParsing '%s' : " file;
-    (* Parser.parse_plo lb |> ignore *)
+    Parser.parse_plo lb |> ignore

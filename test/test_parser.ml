@@ -1,7 +1,7 @@
 open Kaputt.Abbreviations
 open Lexer
 open Parser
-    
+
 (** Parser.
     A [Parser] is a LL(1), top-down recursive descent parser for PL/0 language. The EBNF of the 
     language is as follows. 
@@ -71,6 +71,10 @@ let t_3 =
     (fun pb ->
        let pb = Parser.next pb |> Parser.parse_expression in
        Assert.is_true (pb.lookahead = Eof))
-    (fun _ -> ())                 
-    
-let () = Test.run_tests [t_next;t_factor]
+    (fun _ -> ())
+
+let t_3 =
+  let pb = Parser.default_pb "(x+x)" in
+  let (pb, e1) = 
+
+    let () = Test.run_tests [t_next;t_factor]

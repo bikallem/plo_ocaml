@@ -20,7 +20,7 @@ let next pb = {pb with lookahead = Lexer.next_token pb.lexbuf}
 
 let expect_error pb t fname =
   let la_str = show_token pb.lookahead and e_str = show_token t in
-  let err_msg = Printf.sprintf "Syntax Error. Expected token '%s', however received '%s' in %s.\n" e_str la_str fname in 
+  let err_msg = Printf.sprintf "Syntax Error. Expected token '%s', however received '%s' in %s().\n" e_str la_str fname in 
   let e = Syntax_error err_msg in
   raise e
 
@@ -57,8 +57,8 @@ let rec parse_factor pb =
   | Lparen ->
     let (pb, e) = next pb |> parse_expression in
     let (pb, expected) = expect Rparen pb in
-    if expected then (pb, Expr e) else expect_error pb Rparen "parse_factor()"
-  | _ -> error pb "parse_factor()"
+    if expected then (pb, Expr e) else expect_error pb Rparen "parse_factor"
+  | _ -> error pb "parse_factor"
 
 (* term = factor {("*"|"/") factor}. *)
 and parse_term pb =
@@ -126,101 +126,137 @@ let parse_condition pb =
     in
     (pb, Logical (left_e, l_op, right_e))
 
-(* let parse_condition pb = *)
-(*   let is_condition_operator = is_token_in [Equal;NotEqual;LessThanEql;LessThan;GreaterThan;GreaterThanEql] in *)
-(*   if pb.lookahead = Odd then next pb |> parse_expression *)
-(*   else *)
-(*     let pb = parse_expression pb in *)
-(*     let pb = if is_condition_operator pb.lookahead then next pb else error() in *)
-(*     parse_expression pb *)
+(** Returns Ast.identifier if lookahead token in 'pb' in [Lexer.Ident]. Throws 
+Syntax_error otherwise. *)
+let identifier fname pb =
+    match pb.lookahead with
+    | Lexer.Ident id -> (next pb, id)
+    | _ -> expect_error pb (Lexer.Ident "x") fname
+  
+(** Parse 'statement' productions below: 
+   statement =
+   [ ident ":=" expression
+   | "CALL" ident
+   | "?" ident
+   | "!" expression
+   | "BEGIN" statement {";" statement } "END"
+   | "IF" condition "THEN" statement
+   | "WHILE" condition "DO" statement ]. *)
+let rec parse_statement pb =
+  let stmt_identifier = identifier "parse_statement" in 
+  match pb.lookahead with
+  | Lexer.Ident id -> let (pb, e) = next pb |> parse_expression in (pb, Ast.Assignment (id, e))
+  | Lexer.Call -> let (pb, id) = stmt_identifier (next pb) in (pb, Ast.Call id)
+  | Lexer.Read -> let (pb, id) = stmt_identifier (next pb) in (pb, Ast.Read id)
+  | Lexer.Write -> let (pb, id) = stmt_identifier (next pb) in (pb, Ast.Write id)
+  | Lexer.Begin ->
+    let rec loop_stmts pb l =
+      if pb.lookahead = Semicolon then
+        let (pb, stmt) = next pb |> parse_statement in
+        loop_stmts pb (stmt::l)
+      else
+        (pb, l) in
+    let (pb, stmt) = parse_statement pb in
+    let (pb, stmts) = loop_stmts pb []
+    in
+    if pb.lookahead = Lexer.End then
+      (next pb, Ast.BeginEnd (stmt, stmts))
+    else
+      expect_error pb (Lexer.End) "parse_statement"
+  | Lexer.If ->
+    let (pb, cond) = next pb |> parse_condition in
+    let (pb, stmt) =
+      if pb.lookahead = Lexer.Then then next pb |> parse_statement
+      else expect_error pb Lexer.Then "parse_statement"
+    in
+    (pb, Ast.IfThen (cond,stmt))
+  | Lexer.While ->
+    let (pb, cond) = next pb |> parse_condition in
+    let (pb, stmt) =
+      if pb.lookahead = Lexer.Do then next pb |> parse_statement
+      else expect_error pb Lexer.Do "parse_statement"
+    in
+    (pb, Ast.WhileDo (cond, stmt))
+  | _ -> (pb, Ast.Empty)
 
-(* (\* statement =  *)
-(*    [ ident ":=" expression  *)
-(*    | "CALL" ident  *)
-(*    | "?" ident  *)
-(*    | "!" expression *)
-(*    | "BEGIN" statement {";" statement } "END" *)
-(*    | "IF" condition "THEN" statement *)
-(*    | "WHILE" condition "DO" statement ].  *)
-(* *\) *)
-(* let rec parse_statement pb =  *)
-(*   match pb.lookahead with *)
-(*   | Ident i -> expect Assignment pb |> parse_expression *)
-(*   | Call -> expect (Ident "") pb *)
-(*   | Read -> expect (Ident "") pb  *)
-(*   | Write -> next pb |> parse_expression *)
-(*   | Begin ->      *)
-(*     let rec loop_stmt pbl = *)
-(*       next pbl       *)
-(*       |> function *)
-(*       | pbl when pbl.lookahead = Semicolon -> next pbl |> parse_statement |> loop_stmt *)
-(*       | _ -> pbl *)
-(*     in  *)
-(*     next pb *)
-(*     |> parse_statement *)
-(*     |> loop_stmt *)
-(*     |> expect End  *)
-(*   | If ->  *)
-(*     next pb *)
-(*     |> parse_condition *)
-(*     |> expect Then *)
-(*     |> parse_statement *)
-(*   | While ->  *)
-(*     next pb *)
-(*     |> parse_condition *)
-(*     |> expect Do *)
-(*     |> parse_statement *)
-(*   | _ -> pb               (\* Empty statement. *\) *)
+(** Returns an int if the lookahead token is Lexer.Number. Throws Syntax_error otherwise. *)
+let number fname pb = 
+  match pb.lookahead with
+  | Lexer.Number i -> (next pb, i)
+  | _ -> expect_error pb (Lexer.Number 0) fname
+    
+(* block =
+   ["CONST" ident "=" number { "," ident "=" number} ";"]
+   ["VAR" ident {"," ident} ";"]
+   {"PROCEDURE" ident ";" block ";"} 
+   statement. *)
+let rec parse_block pb =
+  let block_identifier = identifier "parse_block" in
+  let parse_constants pb = 
+    let p_const pb = 
+      let (pb, id) = block_identifier pb in
+      let (pb, num) =
+        if pb.lookahead = Lexer.Equal then next pb |> number "parse_constants" 
+        else expect_error pb Lexer.Equal "parse_constants"
+      in
+      (pb, (id, num)) in
+    let rec loop_constants pb l =
+      if pb.lookahead = Lexer.Comma then
+        let (pb, const) = next pb |> p_const in
+        loop_constants pb (const::l)
+      else (pb, l)
+    in
+    if pb.lookahead = Lexer.Const then 
+      let (pb, c) = next pb |> p_const in
+      let (pb, cl) = loop_constants pb [] in
+      (pb, (c::List.rev cl))
+    else
+      (pb, []) in  
+  let parse_vars pb =
+    let rec loop_vars pb l =
+      if pb.lookahead = Lexer.Comma then
+        let (pb, var) = next pb |> block_identifier in
+        loop_vars pb (var::l)
+      else (pb, l)
+    in
+    if pb.lookahead = Lexer.Var then
+      let (pb, var) = next pb |> block_identifier in
+      let (pb, vars) = loop_vars pb [] in
+      (pb, var::(List.rev vars))
+    else
+      (pb, []) in
+  let parse_procedures pb =
+    let rec loop_procs pb l =
+      if pb.lookahead = Lexer.Procedure then
+        let (pb, id) = next pb |> block_identifier in
+        let (pb, block) =
+          if pb.lookahead = Lexer.Semicolon then next pb |> parse_block
+          else expect_error pb Lexer.Semicolon "parse_procedures" in
+        let pb =
+          if pb.lookahead = Lexer.Semicolon then next pb
+          else expect_error pb Lexer.Semicolon "parse_procedures" in
+        let proc = Procedure (id, block) 
+        in        
+        loop_procs pb (proc::l)
+      else
+        (pb, l)
+    in
+    loop_procs pb [] in 
+  let (pb, constants) = parse_constants pb in
+  let (pb, vars) = parse_vars pb in
+  let (pb, procs) = parse_procedures pb in 
+  let (pb, stmt) = parse_statement pb in
+  (pb, Block(constants, vars, procs, stmt))
+        
+(* program  =   block "."  *)
+let program pb =
+  let (pb, block) = parse_block pb in
+  if pb.lookahead = Lexer.Period then Program block
+  else expect_error pb Lexer.Period "program" 
 
-(* (\* block   =    *)
-(*    ["CONST" ident "=" number { "," ident "=" number} ";"] *)
-(*    ["VAR" ident {"," ident} ";"] *)
-(*    {"PROCEDURE" ident ";" block ";"} statement. *\) *)
-(* let rec parse_block pb = *)
-(*   let pb =  *)
-(*     match pb.lookahead with *)
-(*     | Const ->  *)
-(*       let p_const pb = next pb |> expect (Ident "") |> expect Equal |> expect (Number 0) in *)
-(*       let rec loop_const pb = *)
-(*         next pb *)
-(*         |> function  *)
-(*         | pb when pb.lookahead = Comma -> p_const pb |> loop_const *)
-(*         | _ -> pb *)
-(*       in  *)
-(*       p_const pb *)
-(*       |> loop_const *)
-(*     | Var ->  *)
-(*       let p_var pb = next pb |> expect (Ident "") in *)
-(*       let rec loop_var pb = *)
-(*         next pb *)
-(*         |> function *)
-(*         | pb when pb.lookahead = Comma -> p_var pb |> loop_var *)
-(*         | _ -> pb *)
-(*       in  *)
-(*       p_var pb *)
-(*       |> loop_var *)
-(*     | Procedure -> *)
-(*       let p_proc pb = expect (Ident "") pb |> expect Semicolon |> parse_block in  *)
-(*       let rec loop_proc pb =   *)
-(*         next pb *)
-(*         |> function  *)
-(*         | pb when pb.lookahead = Procedure -> p_proc pb |> loop_proc *)
-(*         | _ -> pb  *)
-(*       in  *)
-(*       p_proc pb *)
-(*       |> loop_proc *)
-(*     | _ -> error() *)
-(*   in  *)
-(*   parse_statement pb *)
-
-(* (\* program  =   block "."  *\) *)
-(* let program pb =    *)
-(*   parse_block pb *)
-(*   |> expect Period  *)
-
-(* (\* Main entry point to the PL/O parser. *\) *)
-(* let parse_plo lb =  *)
-(*   let pb = {lookahead = Lexer.Eof; lexbuf = lb} *)
-(*   in  *)
-(*   next pb  *)
-(*   |> program *)
+(* Main entry point to the PL/O parser. *)
+let parse_plo lb =
+  let pb = {lookahead = Lexer.Eof; lexbuf = lb}
+  in
+  next pb
+  |> program
