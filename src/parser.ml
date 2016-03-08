@@ -1,28 +1,6 @@
 (** Parser.
-    A [Parser] is a LL(1), top-down recursive descent parser for PL/0 language. The EBNF of the 
-    language is as follows. 
-
-    [program  =   block "." .
-
-    block   =   ["CONST" ident "=" number { "," ident "=" number} ";"]
-    ["VAR" ident {"," ident} ";"]
-    {"PROCEDURE" ident ";" block ";"} statement.
-
-    statement   =   [ident ":=" expression | "CALL" ident | "?" ident | "!" expression
-    | "BEGIN" statement {";" statement } "END"
-    | "IF" condition "THEN" statement
-    | "WHILE" condition "DO" statement ].
-
-    condition   =   "ODD" expression | expression ("="|"#"|"<="|"<"|">"|">=") expression .
-
-    expression  =   ["+"|"-"] term {("+"|"-") term}.
-
-    term  =   factor {("*"|"/") factor}.
-
-    factor  =   ident | number | "(" expression ")".]
-
+    A [Parser] is a LL(1), top-down recursive descent parser for PL/0 language. 
     https://en.wikipedia.org/wiki/PL/0. *)
-
 open Lexer
 open Ast
 
@@ -46,12 +24,12 @@ let expect_error pb t fname =
   let e = Syntax_error err_msg in
   raise e
 
+(** Throws [Parse_error]. *)
 let error pb fname =
   let la_str = show_token pb.lookahead in 
   let err_msg = Printf.sprintf "Syntax Error. Unexpected token '%s'\n" la_str in
   let e = Syntax_error err_msg in
   raise e            
-(** Throws [Parse_error]. *)
 
 let is_same t1 t2 =
   match t1, t2 with 
@@ -124,13 +102,35 @@ and parse_expression pb =
   let expr = (start_term, terms) in
   (pb, expr)
 
+(* condition = "ODD" expression | expression ("="|"#"|"<="|"<"|">"|">=") expression . *)
+let parse_condition pb =
+  let logical_op pb =
+    match pb.lookahead with
+    | Lexer.Equal -> (next pb, Ast.Equal)
+    | Lexer.NotEqual -> (next pb, Ast.NotEqual)
+    | Lexer.LessThan -> (next pb, Ast.LessThan)
+    | Lexer.LessThanEql -> (next pb, Ast.LessThanEql)
+    | Lexer.GreaterThan -> (next pb, Ast.GreaterThan)
+    | Lexer.GreaterThanEql -> (next pb, Ast.GreaterThanEql)
+    | _ ->
+      let err_msg = Printf.sprintf "Syntax Error. Expected 'logical_op' token type (\"=\"|\"#\"|\"<=\"|\"<\"|\">\"|\">=\"). Received '%s' instead." (Lexer.show_token pb.lookahead) in
+      raise (Syntax_error err_msg)
+  in 
+  if pb.lookahead = Lexer.Odd then
+    let (pb, e) = next pb |> parse_expression in
+    (pb, Ast.Odd e)
+  else
+    let (pb, left_e) = parse_expression pb in
+    let (pb, l_op) = logical_op pb in 
+    let (pb, right_e) = parse_expression pb
+    in
+    (pb, Logical (left_e, l_op, right_e))
 
-(* (\* condition = "ODD" expression | expression ("="|"#"|"<="|"<"|">"|">=") expression . *\) *)
 (* let parse_condition pb = *)
 (*   let is_condition_operator = is_token_in [Equal;NotEqual;LessThanEql;LessThan;GreaterThan;GreaterThanEql] in *)
 (*   if pb.lookahead = Odd then next pb |> parse_expression *)
-(*   else          *)
-(*     let pb = parse_expression pb in  *)
+(*   else *)
+(*     let pb = parse_expression pb in *)
 (*     let pb = if is_condition_operator pb.lookahead then next pb else error() in *)
 (*     parse_expression pb *)
 

@@ -3,7 +3,7 @@ type expression_op =
   | Minus
   [@@deriving show]
   
-type condition_op =
+type logical_op =
   | Equal
   | NotEqual
   | LessThan
@@ -28,7 +28,7 @@ and start_expression = expression_op option * term [@@deriving show]
 
 type condition =
   | Odd of expression
-  | Logical of expression * condition_op * expression
+  | Logical of expression * logical_op * expression
   [@@deriving show]               
 
 type identifier = string [@@deriving show]
