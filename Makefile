@@ -25,7 +25,7 @@ native:
 	$(OCB) $(OPTIONS) $(PROGRAM).native
 
 test_lexer:
-	$(OCB) $(OPTIONS) test_lexer.byte && ./test_lexer.byte
+	$(OCB) $(OPTIONS) test_lexer.byte 
 
 top: clean byte
 	$(OCB) $(OPTIONS) $(PROGRAM).top

@@ -49,7 +49,7 @@ module KeywordTbl =
   Map.Make(struct
     type t = string
     let compare a b =
-      String.(compare (lowercase a) (lowercase b))
+      String.(compare (lowercase_ascii a) (lowercase_ascii b))
   end)
   
 let keyword_tbl = 
