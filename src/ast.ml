@@ -1,7 +1,3 @@
-type expression_op =
-  | Plus
-  | Minus
-[@@deriving show]
 
 type logical_op =
   | Equal
@@ -23,6 +19,10 @@ and start_expression = expression_op option * term [@@deriving show]
 and term_op =
     Multiply
   | Divide
+[@@deriving show]
+and expression_op =
+    Plus
+  | Minus
 [@@deriving show]
 
 type condition =
