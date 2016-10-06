@@ -4,7 +4,7 @@
 		{
 			"path": "/home/bikal/projects/plo_ocaml",
 			"folder_exclude_patterns": [".git", "_build", "*.docdir"],
-			"file_exclude_patterns": ["*.native", "*.byte", "*.top"]
+			"file_exclude_patterns": ["*.native", "*.byte", "*.top", "**~"]
 		}
 	]
 }
