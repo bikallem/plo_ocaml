@@ -1,0 +1,17 @@
+OASISFormat: 0.4
+OCamlVersion: >= 4.03.0
+Name:        plo_ocaml
+Version:     1.0
+Authors:     Bikal Gurung
+License:     GPL-3
+Plugins:     DevFiles (0.4)
+Copyrights:	 (C) 2016 Bikal Gurung
+Synopsis:    PL/0 parser implemented in Ocaml.
+
+Executable "plo_ocaml.native"
+  Path:       src
+  MainIs:     plo.ml  
+  CompiledObject: native
+  Install : false  
+  BuildDepends: ppx_deriving.std
+  BuildTools:  ocamlbuild

@@ -127,21 +127,21 @@ let parse_condition pb =
     (pb, Logical (left_e, l_op, right_e))
 
 (** Returns Ast.identifier if lookahead token in 'pb' in [Lexer.Ident]. Throws 
-Syntax_error otherwise. *)
+    Syntax_error otherwise. *)
 let identifier fname pb =
-    match pb.lookahead with
-    | Lexer.Ident id -> (next pb, id)
-    | _ -> expect_error pb (Lexer.Ident "x") fname
-  
+  match pb.lookahead with
+  | Lexer.Ident id -> (next pb, id)
+  | _ -> expect_error pb (Lexer.Ident "x") fname
+
 (** Parse 'statement' productions below: 
-   statement =
-   [ ident ":=" expression
-   | "CALL" ident
-   | "?" ident
-   | "!" expression
-   | "BEGIN" statement {";" statement } "END"
-   | "IF" condition "THEN" statement
-   | "WHILE" condition "DO" statement ]. *)
+    statement =
+    [ ident ":=" expression
+    | "CALL" ident
+    | "?" ident
+    | "!" expression
+    | "BEGIN" statement {";" statement } "END"
+    | "IF" condition "THEN" statement
+    | "WHILE" condition "DO" statement ]. *)
 let rec parse_statement pb =
   let stmt_identifier = identifier "parse_statement" in 
   match pb.lookahead with
@@ -184,7 +184,7 @@ let number fname pb =
   match pb.lookahead with
   | Lexer.Number i -> (next pb, i)
   | _ -> expect_error pb (Lexer.Number 0) fname
-    
+
 (* block =
    ["CONST" ident "=" number { "," ident "=" number} ";"]
    ["VAR" ident {"," ident} ";"]
@@ -247,7 +247,7 @@ let rec parse_block pb =
   let (pb, procs) = parse_procedures pb in 
   let (pb, stmt) = parse_statement pb in
   (pb, Block(constants, vars, procs, stmt))
-        
+
 (* program  =   block "."  *)
 let program pb =
   let (pb, block) = parse_block pb in

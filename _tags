@@ -1,5 +1,0 @@
-true : bin_annot, annot, safe_string
-true : package(oUnit)
-true : package(ppx_deriving.std)
-<src> : include
-<test> : include

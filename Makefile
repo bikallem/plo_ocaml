@@ -1,34 +1,41 @@
-PROGRAM=plo
+# OASIS_START
+# DO NOT EDIT (digest: a3c674b4239234cbbe53afe090018954)
 
-# OCaml build tool.
-OCB=ocamlbuild
-OPTIONS=-use-ocamlfind -classic-display
+SETUP = ocaml setup.ml
 
-all: clean indent byte native top
+build: setup.data
+	$(SETUP) -build $(BUILDFLAGS)
 
-docs:	
-	$(OCB) $(PROGRAM).docdir/index.html
+doc: setup.data build
+	$(SETUP) -doc $(DOCFLAGS)
 
-clean: 
-	$(OCB) -clean 
+test: setup.data build
+	$(SETUP) -test $(TESTFLAGS)
 
-indent:
-	ocp-indent -i src/*.ml
-	#ocp-indent -i src/*.mli	
-	ocp-indent -i test/*.ml
-	#ocp-indent -i test/*.mli
+all:
+	$(SETUP) -all $(ALLFLAGS)
 
-byte:
-	$(OCB) $(OPTIONS) $(PROGRAM).byte 
+install: setup.data
+	$(SETUP) -install $(INSTALLFLAGS)
 
-native:
-	$(OCB) $(OPTIONS) $(PROGRAM).native
+uninstall: setup.data
+	$(SETUP) -uninstall $(UNINSTALLFLAGS)
 
-test_lexer:
-	$(OCB) $(OPTIONS) test_lexer.byte 
+reinstall: setup.data
+	$(SETUP) -reinstall $(REINSTALLFLAGS)
 
-top: clean byte
-	$(OCB) $(OPTIONS) $(PROGRAM).top
+clean:
+	$(SETUP) -clean $(CLEANFLAGS)
 
-run-top: top
-	./$(PROGRAM).top -safe-string
+distclean:
+	$(SETUP) -distclean $(DISTCLEANFLAGS)
+
+setup.data:
+	$(SETUP) -configure $(CONFIGUREFLAGS)
+
+configure:
+	$(SETUP) -configure $(CONFIGUREFLAGS)
+
+.PHONY: build doc test all install uninstall reinstall clean distclean configure
+
+# OASIS_STOP

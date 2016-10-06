@@ -9,3 +9,5 @@ _build
 *.cmo
 *.cmi
 *~
+setup.data
+setup.log
