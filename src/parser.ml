@@ -55,9 +55,9 @@ let rec parse_factor pb =
   | Ident id -> (next pb, Identifier id)
   | Number num ->(next pb, Number num)
   | Lparen ->
-    let (pb, e) = next pb |> parse_expression in
-    let (pb, expected) = expect Rparen pb in
-    if expected then (pb, Expr e) else expect_error pb Rparen "parse_factor"
+      let (pb, e) = next pb |> parse_expression in
+      let (pb, expected) = expect Rparen pb in
+      if expected then (pb, Expr e) else expect_error pb Rparen "parse_factor"
   | _ -> error pb "parse_factor"
 
 (* term = factor {("*"|"/") factor}. *)
@@ -85,17 +85,17 @@ and parse_expression pb =
       let (pb, t) = next pb |> parse_term in
       (pb, (Some Ast.Minus, t))
     else
-      let (pb, t) = parse_term pb in
-      (pb, (None, t)) in
+    let (pb, t) = parse_term pb in
+    (pb, (None, t)) in
 
   let rec loop_terms pb terms =   
     match pb.lookahead with
     | Lexer.Plus ->
-      let (pb, t) = next pb |> parse_term in 
-      loop_terms pb ((Ast.Plus, t)::terms)
+        let (pb, t) = next pb |> parse_term in 
+        loop_terms pb ((Ast.Plus, t)::terms)
     | Lexer.Minus ->
-      let (pb, t) = next pb |> parse_term in
-      loop_terms pb ((Ast.Minus, t)::terms)
+        let (pb, t) = next pb |> parse_term in
+        loop_terms pb ((Ast.Minus, t)::terms)
     | _ -> (pb, terms) in 
   let (pb, start_term) = p_start_term pb in
   let (pb, terms) = loop_terms pb [] in 
@@ -113,18 +113,18 @@ let parse_condition pb =
     | Lexer.GreaterThan -> (next pb, Ast.GreaterThan)
     | Lexer.GreaterThanEql -> (next pb, Ast.GreaterThanEql)
     | _ ->
-      let err_msg = Printf.sprintf "Syntax Error. Expected 'logical_op' token type (\"=\"|\"#\"|\"<=\"|\"<\"|\">\"|\">=\"). Received '%s' instead." (Lexer.show_token pb.lookahead) in
-      raise (Syntax_error err_msg)
+        let err_msg = Printf.sprintf "Syntax Error. Expected 'logical_op' token type (\"=\"|\"#\"|\"<=\"|\"<\"|\">\"|\">=\"). Received '%s' instead." (Lexer.show_token pb.lookahead) in
+        raise (Syntax_error err_msg)
   in 
   if pb.lookahead = Lexer.Odd then
     let (pb, e) = next pb |> parse_expression in
     (pb, Ast.Odd e)
   else
-    let (pb, left_e) = parse_expression pb in
-    let (pb, l_op) = logical_op pb in 
-    let (pb, right_e) = parse_expression pb
-    in
-    (pb, Logical (left_e, l_op, right_e))
+  let (pb, left_e) = parse_expression pb in
+  let (pb, l_op) = logical_op pb in 
+  let (pb, right_e) = parse_expression pb
+  in
+  (pb, Logical (left_e, l_op, right_e))
 
 (** Returns Ast.identifier if lookahead token in 'pb' in [Lexer.Ident]. Throws 
     Syntax_error otherwise. *)
@@ -150,33 +150,33 @@ let rec parse_statement pb =
   | Lexer.Read -> let (pb, id) = stmt_identifier (next pb) in (pb, Ast.Read id)
   | Lexer.Write -> let (pb, id) = stmt_identifier (next pb) in (pb, Ast.Write id)
   | Lexer.Begin ->
-    let rec loop_stmts pb l =
-      if pb.lookahead = Semicolon then
-        let (pb, stmt) = next pb |> parse_statement in
-        loop_stmts pb (stmt::l)
-      else
+      let rec loop_stmts pb l =
+        if pb.lookahead = Semicolon then
+          let (pb, stmt) = next pb |> parse_statement in
+          loop_stmts pb (stmt::l)
+        else
         (pb, l) in
-    let (pb, stmt) = parse_statement pb in
-    let (pb, stmts) = loop_stmts pb []
-    in
-    if pb.lookahead = Lexer.End then
-      (next pb, Ast.BeginEnd (stmt, stmts))
-    else
+      let (pb, stmt) = parse_statement pb in
+      let (pb, stmts) = loop_stmts pb []
+      in
+      if pb.lookahead = Lexer.End then
+        (next pb, Ast.BeginEnd (stmt, stmts))
+      else
       expect_error pb (Lexer.End) "parse_statement"
   | Lexer.If ->
-    let (pb, cond) = next pb |> parse_condition in
-    let (pb, stmt) =
-      if pb.lookahead = Lexer.Then then next pb |> parse_statement
-      else expect_error pb Lexer.Then "parse_statement"
-    in
-    (pb, Ast.IfThen (cond,stmt))
+      let (pb, cond) = next pb |> parse_condition in
+      let (pb, stmt) =
+        if pb.lookahead = Lexer.Then then next pb |> parse_statement
+        else expect_error pb Lexer.Then "parse_statement"
+      in
+      (pb, Ast.IfThen (cond,stmt))
   | Lexer.While ->
-    let (pb, cond) = next pb |> parse_condition in
-    let (pb, stmt) =
-      if pb.lookahead = Lexer.Do then next pb |> parse_statement
-      else expect_error pb Lexer.Do "parse_statement"
-    in
-    (pb, Ast.WhileDo (cond, stmt))
+      let (pb, cond) = next pb |> parse_condition in
+      let (pb, stmt) =
+        if pb.lookahead = Lexer.Do then next pb |> parse_statement
+        else expect_error pb Lexer.Do "parse_statement"
+      in
+      (pb, Ast.WhileDo (cond, stmt))
   | _ -> (pb, Ast.Empty)
 
 (** Returns an int if the lookahead token is Lexer.Number. Throws Syntax_error otherwise. *)
@@ -211,7 +211,7 @@ let rec parse_block pb =
       let (pb, cl) = loop_constants pb [] in
       (pb, (c::List.rev cl))
     else
-      (pb, []) in  
+    (pb, []) in  
   let parse_vars pb =
     let rec loop_vars pb l =
       if pb.lookahead = Lexer.Comma then
@@ -224,7 +224,7 @@ let rec parse_block pb =
       let (pb, vars) = loop_vars pb [] in
       (pb, var::(List.rev vars))
     else
-      (pb, []) in
+    (pb, []) in
   let parse_procedures pb =
     let rec loop_procs pb l =
       if pb.lookahead = Lexer.Procedure then
@@ -239,7 +239,7 @@ let rec parse_block pb =
         in        
         loop_procs pb (proc::l)
       else
-        (pb, l)
+      (pb, l)
     in
     loop_procs pb [] in 
   let (pb, constants) = parse_constants pb in
