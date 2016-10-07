@@ -1,4 +1,7 @@
-# plo_ocaml_LL1
-PL/0 parser(hand crafted LL1) implemented in Ocaml. The backend will eventually target LLVM or NASM assembly.
+# PL/O Ocaml
+`plo_ocaml` implements Niklaus Wirth's PL/O programming language in Ocaml. PL/0 is well documented at [wikipedia](https://en.wikipedia.org/wiki/PL/0)
 
-https://en.wikipedia.org/wiki/PL/0
+#Implementation Details 
+##Lexer - Lexer is implemented via `ocamllex`.
+##Parser - Parser is a hand-crafted LL(1) parser.
+##Backend - LLVM and NASM assembly(WIP - Work in Progress).
