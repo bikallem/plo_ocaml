@@ -3,19 +3,20 @@ OCamlVersion: >= 4.03.0
 Name:        plo_ocaml
 Version:     1.0
 Authors:     Bikal Gurung
-License:     MPL-2
+License:     MPL
 Plugins:     DevFiles (0.4)
 Copyrights:	 (C) 2016 Bikal Gurung
-Synopsis:    PL/0 parser implemented in Ocaml.
+Synopsis:    PL/0 language implemented in Ocaml.
 Homepage: https://github.com/neolem/plo_ocaml_LL1
-Description: 
-	* PL/0 parser(hand crafted LL1) implemented in Ocaml. 
-	* The backend will eventually target LLVM or NASM assembly.
+Description:
+  * PL/0 language - as described by Niklaus Wirth - implementation
+  * Parser(hand crafted LL1) implemented in Ocaml. 
+  * The backend will eventually target LLVM or NASM assembly.
 
-Executable "plo_ocaml.native"
+Executable "plo_ocaml"
   Path:       src
   MainIs:     plo.ml  
-  CompiledObject: native
+  CompiledObject: best
   Install : false  
   BuildDepends: ppx_deriving.std
   BuildTools:  ocamlbuild
