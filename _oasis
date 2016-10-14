@@ -8,15 +8,16 @@ Plugins:     DevFiles (0.4)
 Copyrights:	 (C) 2016 Bikal Gurung
 Synopsis:    PL/0 language implemented in Ocaml.
 Homepage: https://github.com/neolem/plo_ocaml_LL1
+BuildTools:  ocamlbuild
 Description:
   * PL/0 language - as described by Niklaus Wirth - implementation
   * Parser(hand crafted LL1) implemented in Ocaml. 
   * The backend will eventually target LLVM or NASM assembly.
 
-Executable "plo_ocaml"
+Executable plo_ocaml
   Path:       src
   MainIs:     plo.ml  
   CompiledObject: best
   Install : false  
-  BuildDepends: ppx_deriving.std
-  BuildTools:  ocamlbuild
+  BuildDepends: ppx_deriving.std  
+

@@ -1,6 +1,4 @@
-open Kaputt.Abbreviations
-open Lexer
-open Parser
+
 
 (** Parser.
     A [Parser] is a LL(1), top-down recursive descent parser for PL/0 language. The EBNF of the 
@@ -47,6 +45,38 @@ END."
 
 let lb = Lexing.from_string
 
+module To_test = struct 
+  let capit letter = Astring.Char.Ascii.uppercase letter 
+  let plus int_list = List.fold_left (fun a b -> a + b) 0 int_list
+end 
+
+
+let capit() =
+  Alcotest.(check char) "Check A" 'A' (To_test.capit 'a')
+
+let plus() =
+  Alcotest.(check int) "Sum equals to 7" 7 (To_test.plus [1;1;2;3])
+
+let test_set = [
+  "\xF0\x9F\x90\xAB Capitalize", `Quick, capit;
+  "Add entries"                , `Slow , plus;
+]  
+
+let () = 
+  Alcotest.run "My first test" [
+    "test_1", test_set;
+    "test_2", test_set;
+  ]
+
+let ident_test() = ()
+  (* Alcotest.check Lexer.token "Check Ident" (Lexer.Ident "x") (Lexer.Ident "x")(* (Parser.default_pb "x" |> Parser.next) *) *)
+
+let l = Lexer.Ident "x"
+Lexer.to_string l
+
+
+(*  
+
 let t_next =
   Test.make_assert_test
     ~title:"test next()"
@@ -78,3 +108,4 @@ let t_3 =
   let (pb, e1) = 
 
     let () = Test.run_tests [t_next;t_factor]
+ *)

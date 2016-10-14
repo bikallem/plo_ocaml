@@ -42,8 +42,41 @@ type token =
   | Divide        (** /  *)
   | Lparen            (** (  *)
   | Rparen            (** )  *)
-  | Eof               (** end of file also known as ['$'] *)
-  [@@deriving show]
+  | Eof               (** end of file also known as ['$'] *)  
+
+let to_string t = 
+  match t with 
+  | Period            -> "."
+  | Const             -> "const"
+  | Ident s           -> s
+  | Equal             -> "="
+  | Number i          -> string_of_int i
+  | Comma             -> ","
+  | Semicolon         -> ";"
+  | Var               -> "var"
+  | Procedure         -> "procedure"
+  | Assignment        -> ":="
+  | Call              -> "call"
+  | Read              -> "?"
+  | Write             -> "!" 
+  | Begin             -> "begin"
+  | End               -> "end"
+  | If                -> "if"
+  | Then              -> "then"
+  | While             -> "while"
+  | Do                -> "do"
+  | Odd               -> "odd"  
+  | NotEqual          -> "#"
+  | LessThan          -> "<"
+  | LessThanEql       -> "<="
+  | GreaterThan       -> ">"
+  | GreaterThanEql    -> ">="
+  | Plus              -> "+"
+  | Minus             -> "-"
+  | Times             -> "*"      
+  | Divide            -> "/"
+  | Lparen            -> "("
+  | Rparen            -> ")"
   
 module KeywordTbl =
   Map.Make(struct
