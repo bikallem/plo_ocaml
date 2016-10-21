@@ -77,6 +77,7 @@ let to_string t =
   | Divide            -> "/"
   | Lparen            -> "("
   | Rparen            -> ")"
+  | Eof               -> ""
   
 module KeywordTbl =
   Map.Make(struct

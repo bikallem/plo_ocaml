@@ -18,6 +18,4 @@ Executable plo_ocaml
   Path:       src
   MainIs:     plo.ml  
   CompiledObject: best
-  Install : false  
-  BuildDepends: ppx_deriving.std  
-
+  Install : false

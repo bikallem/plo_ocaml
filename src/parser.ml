@@ -40,7 +40,7 @@ let is_same t1 t2 =
 (** Returns [true] if two [Lexer.token]s are the same type, [false] otherwise. *)
 
 let is_token_in l t = List.exists (is_same t) l
-(** Returns true if token 't' is in [list Lexer.token] 'l'. false otherwise. *)
+(** Returns true if token 't' is in [Lexer.token list] 'l'. false otherwise. *)
 
 let expect t pb =
   let expected = is_same t pb.lookahead in
@@ -126,12 +126,12 @@ let parse_condition pb =
   in
   (pb, Logical (left_e, l_op, right_e))
 
-(** Returns Ast.identifier if lookahead token in 'pb' in [Lexer.Ident]. Throws 
-    Syntax_error otherwise. *)
 let identifier fname pb =
   match pb.lookahead with
   | Lexer.Ident id -> (next pb, id)
   | _ -> expect_error pb (Lexer.Ident "x") fname
+(** Returns Ast.identifier if lookahead token in [pb] is [Lexer.Ident]. Throws 
+    Syntax_error otherwise. *)
 
 (** Parse 'statement' productions below: 
     statement =
