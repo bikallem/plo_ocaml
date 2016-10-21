@@ -2,7 +2,6 @@
 #directory "src";;
 
 #use "topfind";;
-#require "ppx_deriving.show";;
 
 (* load project modules. *)
 #load "ast.cmo";;
