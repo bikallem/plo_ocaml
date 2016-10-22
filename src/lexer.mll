@@ -46,25 +46,25 @@ type token =
 let to_string t = 
   match t with 
   | Period            -> "."
-  | Const             -> "const"
+  | Const             -> "CONST"
   | Ident s           -> s
   | Equal             -> "="
   | Number i          -> string_of_int i
   | Comma             -> ","
   | Semicolon         -> ";"
-  | Var               -> "var"
-  | Procedure         -> "procedure"
+  | Var               -> "VAR"
+  | Procedure         -> "PROCEDURE"
   | Assignment        -> ":="
-  | Call              -> "call"
+  | Call              -> "CALL"
   | Read              -> "?"
   | Write             -> "!" 
-  | Begin             -> "begin"
-  | End               -> "end"
-  | If                -> "if"
-  | Then              -> "then"
-  | While             -> "while"
-  | Do                -> "do"
-  | Odd               -> "odd"  
+  | Begin             -> "BEGIN"
+  | End               -> "END"
+  | If                -> "IF"
+  | Then              -> "THEN"
+  | While             -> "WHILE"
+  | Do                -> "DO"
+  | Odd               -> "ODD"  
   | NotEqual          -> "#"
   | LessThan          -> "<"
   | LessThanEql       -> "<="
@@ -89,17 +89,17 @@ let keyword_tbl =
   List.fold_left
   (fun tbl (kwd, tok) -> KeywordTbl.add kwd tok tbl)
   KeywordTbl.empty
-  ["const", Const;   
-   "procedure", Procedure;
-   "var", Var;   
-   "call", Call;   
-   "begin", Begin;
-   "end", End;
-   "if", If;
-   "then", Then;
-   "while", While;
-   "do", Do;
-   "odd", Odd]
+  ["CONST", Const;   
+   "PROCEDURE", Procedure;
+   "VAR", Var;   
+   "CALL", Call;   
+   "BEGIN", Begin;
+   "END", End;
+   "IF", If;
+   "THEN", Then;
+   "WHILE", While;
+   "DO", Do;
+   "ODD", Odd]
 }
 
 let str = ['A'-'Z' 'a'-'z']['A'-'Z' 'a'-'z' '0'-'9']*

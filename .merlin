@@ -1,6 +1,6 @@
 S src
 S test
-S _build/**
+S _build/src
 
 B _build/**
 

@@ -1,48 +1,86 @@
-open Lexer
+open Alcotest
 
-(* let lexbuf = Lexing.from_string
+(* make Lexer.token type testable. *)
+let tok_testable = 
+  let module M = struct 
+    type t = Lexer.token
+    let pp fmt t = Format.fprintf fmt "%s" (Lexer.to_string t)
+    let equal = (=)
+  end in
+  (module M: TESTABLE with type t = M.t)
 
-let test_var _ = 
-  let lb = lexbuf "var" in 
-  let tok1 = Lexer.next_token lb in  	
-  assert_equal tok1 Var	
+(*+----------------- Helpers ---------------------+*)
 
-let test_ident _ = 
-  let lb = lexbuf "var vart" in 
-  let tok1 = Lexer.next_token lb |> ignore; Lexer.next_token lb in 
-  assert_equal tok1 (Ident "vart")
+let tokens s = 
+  let lb = Lexing.from_string s in
+  let rec loop l = 
+    match Lexer.next_token lb with
+    | Lexer.Eof -> l
+    | t -> loop (t::l)
+  in 
+  loop []
+  |> List.rev 
 
-let suite =
-  "lexer tests" >:::
-  ["test_var">:: test_var;
-   "test_ident" >:: test_ident]
+let tl = Alcotest.list tok_testable
+(*+----------------- Helpers ---------------------+*)
 
-let () =
-  run_test_tt_main suite
- *)
+(*+----------------- Tests -----------------------+*)
 
-let t = Lexer.Ident "vaasdd"
+let test_var_tokens () =     
+    let inp = "VAR x,y,z;" in
+    let actual_toks = tokens inp in 
+    let expected_toks = [Lexer.Var; Lexer.Ident "x"; Lexer.Comma; Lexer.Ident "y"; Lexer.Comma;Lexer.Ident "z"; Lexer.Semicolon]  in
+    let msg = Printf.sprintf "Check VAR tokens: %s" inp in 
+    Alcotest.check tl msg expected_toks actual_toks
 
-module To_test = struct 
-  let capit letter = Astring.Char.Ascii.uppercase letter 
-  let plus int_list = List.fold_left (fun a b -> a + b) 0 int_list
-end 
+open Lexer 
 
+let plo_1 = "
+VAR x, squ;
 
-let capit() =
-  Alcotest.(check char) "Check A" 'A' (To_test.capit 'a')
+PROCEDURE square;
+BEGIN
+   squ:= x * x
+END;
 
-let plus() =
-  Alcotest.(check int) "Sum equals to 7" 7 (To_test.plus [1;1;2;3])
+BEGIN
+   x := 1;
+   WHILE x <= 10 DO
+   BEGIN
+      CALL square;
+      ! squ;
+      x := x + 1
+   END
+END.
+"
+let test_plo_1_tokens () = 
+  let expected_toks =   
+    [Var; Ident "x"; Comma; Ident "squ"; Semicolon; 
+    Procedure; Ident "square"; Semicolon; 
+    Begin; 
+    Ident "squ"; Assignment; Ident "x"; Times; Ident "x"; 
+    End; Semicolon; 
+    Begin; 
+    Ident "x"; Assignment; Number 1; Semicolon; 
+    While;
+    Ident "x"; LessThanEql; Number 10; Do; 
+    Begin; 
+    Call; Ident "square"; Semicolon;
+    Write; Ident "squ"; Semicolon; 
+    Ident "x"; Assignment; Ident "x"; Plus; Number 1; 
+    End; 
+    End; Period] and 
+  actual_toks = tokens plo_1 
+  in 
+  Alcotest.check tl "pl/0 tokens" expected_toks actual_toks
 
+(*+----------------- Tests -----------------------+*)
+
+(*+----------------- Main ------------------------+*)
 let test_set = [
-  "\xF0\x9F\x90\xAB Capitalize", `Quick, capit;
-  "Add entries"                , `Slow , plus;
-]  
+  "VAR declaration tokens", `Quick, test_var_tokens;
+  "PL/0 tokens",            `Quick, test_plo_1_tokens]
 
 let () = 
-  Alcotest.run "My first test" [
-    "test_1", test_set;
-    "test_2", test_set;
-  ]
-
+  Alcotest.run "PL/0 tokens test" ["tokens", test_set]
+(*+----------------- Main ------------------------+*)
