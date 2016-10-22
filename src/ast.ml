@@ -44,7 +44,7 @@ type var = identifier
 type block =
   | Block of constant list * var list * procedure list * statement
 and procedure =
-    | Procedure of identifier * block 
+  | Procedure of identifier * block 
 
 type program =
   | Program of block

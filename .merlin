@@ -4,8 +4,6 @@ S _build/**
 
 B _build/**
 
-#PKG oUnit
-PKG ppx_deriving.std
 PKG alcotest
 PKG astring
 

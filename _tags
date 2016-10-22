@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: a97ca53ca6e3cf2ffa98f1d01d072a97)
+# DO NOT EDIT (digest: d5cdc7a15a60df3f03201003f35f2966)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -14,5 +14,4 @@ true: annot, bin_annot
 ".git": not_hygienic
 "_darcs": -traverse
 "_darcs": not_hygienic
-# Executable plo_ocaml
 # OASIS_STOP

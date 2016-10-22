@@ -14,8 +14,27 @@ Description:
   * Parser(hand crafted LL1) implemented in Ocaml. 
   * The backend will eventually target LLVM or NASM assembly.
 
+Library plo_lib
+  Path:             src
+  Modules:          Ast, Lexer, Parser
+  Install:          false  
+
 Executable plo_ocaml
-  Path:       src
-  MainIs:     plo.ml  
-  CompiledObject: best
-  Install : false
+  Path:             src
+  MainIs:           plo.ml  
+  CompiledObject:   best
+  Install :         false
+  Build$:           flag(native)
+  BuildDepends:     plo_lib
+
+Executable test_lexer
+  Path:             test
+  MainIs:           test_lexer.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     plo_lib,alcotest     
+
+Test test_lexer
+  Run$:             flag(tests)
+  Command:          $test_lexer

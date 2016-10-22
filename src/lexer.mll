@@ -4,10 +4,9 @@
 exception Lexer_error of string
 (** Raised when [!Lexer] encounters unrecongnized character. *)
 
-let error_msg lexbuf = 
-  Printf.sprintf "At offset %d: unexpected character.\n" (Lexing.lexeme_start lexbuf)
-  |> fun s -> Lexer_error s
-  |> raise
+let error_msg c lexbuf = 
+  let e = Printf.sprintf "Unrecognized character '%c' at offset %d: " c (Lexing.lexeme_start lexbuf) in 
+  raise (Lexer_error e)  
 
 (** Represents terminal symbols for PL/O. *)
 type token = 
@@ -110,6 +109,7 @@ let num = ['0'-'9']+
 rule next_token = parse 
 |  ws       { next_token lexbuf } (* skip blanks. *)
 | '.'       { Period }
+| ';'       { Semicolon }
 | '='       { Equal }
 | ','       { Comma }
 | ":="      { Assignment }
@@ -130,5 +130,6 @@ rule next_token = parse
 | str as s  { try KeywordTbl.find s keyword_tbl
               with Not_found -> Ident (s) }
 | eof       { Eof }
-| _         { error_msg lexbuf }
+| _   as c  { error_msg c lexbuf }
+
 (** Retrieves the next recongnized token from [lexbuf]. *)

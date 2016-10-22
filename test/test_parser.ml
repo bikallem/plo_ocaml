@@ -1,30 +1,3 @@
-
-
-(** Parser.
-    A [Parser] is a LL(1), top-down recursive descent parser for PL/0 language. The EBNF of the 
-    language is as follows. 
-
-    [program  =   block "." .
-
-    block   =   ["CONST" ident "=" number { "," ident "=" number} ";"]
-    ["VAR" ident {"," ident} ";"]
-    {"PROCEDURE" ident ";" block ";"} statement.
-
-    statement   =   [ident ":=" expression | "CALL" ident | "?" ident | "!" expression
-    | "BEGIN" statement {";" statement } "END"
-    | "IF" condition "THEN" statement
-    | "WHILE" condition "DO" statement ].
-
-    condition   =   "ODD" expression | expression ("="|"#"|"<="|"<"|">"|">=") expression .
-
-    expression  =   ["+"|"-"] term {("+"|"-") term}.
-
-    term  =   factor {("*"|"/") factor}.
-
-    factor  =   ident | number | "(" expression ")".]
-
-    https://en.wikipedia.org/wiki/PL/0. *)
-
 let sample1 = "
 VAR x, squ;
 
@@ -68,11 +41,6 @@ let () =
     "test_2", test_set;
   ]
 
-let ident_test() = ()
-  (* Alcotest.check Lexer.token "Check Ident" (Lexer.Ident "x") (Lexer.Ident "x")(* (Parser.default_pb "x" |> Parser.next) *) *)
-
-let l = Lexer.Ident "x"
-Lexer.to_string l
 
 
 (*  
